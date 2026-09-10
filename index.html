@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIASEC Career Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#1e88e5;
+  --ink:#1c2333; --muted:#68718a; --line:#e6e9f2;
+  --card:#ffffff; --bg:#f2f5fb;
+  --warn-bg:#fff7e0; --warn-bd:#f2d488; --warn-tx:#7a5b00;
+  --info-bg:#e8f1ff; --info-bd:#b3d0f5; --info-tx:#1c4d8f;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,Arial,sans-serif; color:var(--ink);
+  background:var(--bg); min-height:100vh; position:relative;
+}
+/* decorative background blobs */
+body::before,body::after{
+  content:""; position:fixed; border-radius:50%; filter:blur(90px); z-index:0; pointer-events:none;
+}
+body::before{width:420px;height:420px;background:color-mix(in srgb,var(--accent) 26%,transparent);top:-140px;right:-120px;transition:background .6s}
+body::after{width:360px;height:360px;background:color-mix(in srgb,var(--accent) 16%,transparent);bottom:-140px;left:-120px;transition:background .6s}
+
+.wrap{max-width:820px;margin:0 auto;padding:28px 18px 60px;position:relative;z-index:1}
+
+/* ---------- top progress ---------- */
+#topbar{position:fixed;top:0;left:0;right:0;height:6px;background:#e2e7f2;z-index:50}
+#topfill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 55%,#8e24aa));
+  transition:width .5s cubic-bezier(.22,.9,.3,1), background .6s}
+
+/* ---------- generic ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 8px 28px rgba(28,35,51,.07);padding:28px}
+.btn{border:0;cursor:pointer;font:600 15px 'Inter',sans-serif;padding:13px 26px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 60%,#6a1fb0));
+  color:#fff;transition:transform .15s,box-shadow .15s,filter .15s;
+  box-shadow:0 6px 16px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px color-mix(in srgb,var(--accent) 45%,transparent);filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:#fff;color:var(--accent);border:1.5px solid color-mix(in srgb,var(--accent) 40%,#fff);box-shadow:none}
+.btn.ghost:hover{background:color-mix(in srgb,var(--accent) 8%,#fff)}
+
+/* ---------- intro ---------- */
+#intro .eyebrow{letter-spacing:.18em;font-size:12px;font-weight:600;color:var(--accent);text-transform:uppercase}
+#intro h1{font-size:34px;font-weight:800;line-height:1.15;margin:8px 0 6px;
+  background:linear-gradient(90deg,var(--accent),#8e24aa);-webkit-background-clip:text;background-clip:text;color:transparent}
+#intro .sub{color:var(--muted);margin-bottom:20px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 22px}
+.lg{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;
+  padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fafbfe}
+.lg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.pulse{position:relative}
+.pulse::after{content:"";position:absolute;inset:0;border-radius:12px;border:2px solid var(--accent);
+  animation:pulse 2s infinite;pointer-events:none}
+@keyframes pulse{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.18)}}
+
+/* ---------- quiz header ---------- */
+.quizhead{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 16px}
+.pagepill{font-size:13px;font-weight:600;color:var(--muted)}
+.secpill{font-weight:800;font-size:15px;color:#fff;padding:8px 16px;border-radius:999px;
+  background:var(--accent);box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 40%,transparent);
+  transition:background .6s}
+.q{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:18px 20px;
+  margin-bottom:14px;box-shadow:0 4px 14px rgba(28,35,51,.05);
+  animation:fadeUp .45s cubic-bezier(.22,.9,.3,1) both;transition:border-color .3s, box-shadow .3s}
+.q:hover{box-shadow:0 8px 22px rgba(28,35,51,.09)}
+.q.missing{border-color:#e53935;animation:shake .4s}
+.qnum{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;
+  border-radius:9px;background:color-mix(in srgb,var(--accent) 12%,#fff);color:var(--accent);
+  font-weight:800;font-size:13px;margin-right:10px;transition:background .6s,color .6s}
+.qtext{font-weight:600;font-size:15.5px;line-height:1.45;display:inline}
+.q.missing .qnum{background:#fdecec;color:#c62828}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+/* ---------- multiple choice ---------- */
+.opts{margin-top:12px;display:grid;gap:8px}
+.opt{position:relative;display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;
+  border:1.5px solid var(--line);border-radius:11px;font-size:14.5px;background:#fff;
+  transition:border-color .18s,background .18s,transform .18s}
+.opt:hover{border-color:color-mix(in srgb,var(--accent) 55%,#fff);background:#fafcff;transform:translateX(4px)}
+.opt:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.opt .key{flex:0 0 22px;height:22px;border-radius:6px;background:#eef1f8;color:var(--muted);
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.opt .tickmark{margin-left:auto;color:var(--accent);font-weight:800;opacity:0;transform:scale(.4);transition:all .2s}
+.opt.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,#fff);
+  font-weight:600;animation:pop .25s}
+.opt.selected .key{background:var(--accent);color:#fff}
+.opt.selected .tickmark{opacity:1;transform:scale(1)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.015)}100%{transform:scale(1)}}
+.sr{position:absolute;opacity:0;pointer-events:none}
+
+/* ---------- likert slider ---------- */
+.likert{margin-top:16px}
+.lcur{text-align:center;font-size:15px;font-weight:700;color:var(--accent);min-height:24px;
+  margin-bottom:12px;transition:color .2s}
+.lcur.idle{color:#a6adc4;font-weight:600}
+.range{-webkit-appearance:none;appearance:none;width:100%;height:9px;border-radius:99px;outline:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--accent) var(--p,50%),#e3e8f2 var(--p,50%));transition:opacity .2s,filter .2s}
+.range.untouched{filter:grayscale(1);opacity:.55}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+  background:#fff;border:4px solid var(--accent);cursor:grab;
+  box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 45%,transparent);
+  transition:transform .15s,border-color .6s}
+.range::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.range:active::-webkit-slider-thumb{cursor:grabbing;transform:scale(1.25)}
+.range::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;
+  border:4px solid var(--accent);cursor:grab;box-shadow:0 3px 10px color-mix(in srgb,var(--accent) 45%,transparent)}
+.ticks{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:10px}
+.tick{text-align:center;cursor:pointer;user-select:none;padding:4px 2px;border-radius:8px;transition:background .15s}
+.tick:hover{background:#f0f3fa}
+.tick .dot{width:11px;height:11px;border-radius:50%;border:2.5px solid #cdd5e6;margin:0 auto 5px;
+  transition:all .2s;background:#fff}
+.tick span{font-size:10.5px;line-height:1.25;color:var(--muted);font-weight:600;display:block}
+.tick.active .dot{background:var(--accent);border-color:var(--accent);transform:scale(1.2);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+.tick.active span{color:var(--accent);font-weight:800}
+
+/* ---------- nav ---------- */
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:#232a3d;color:#fff;font-size:14px;font-weight:600;padding:12px 20px;border-radius:12px;
+  opacity:0;pointer-events:none;transition:all .3s;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- results ---------- */
+#results h2{font-size:26px;font-weight:800;margin-bottom:4px;
+  background:linear-gradient(90deg,var(--accent),#8e24aa);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rsub{color:var(--muted);margin-bottom:22px}
+.codewrap{display:flex;gap:14px;margin:14px 0 26px}
+.cletter{width:66px;text-align:center;animation:popIn .55s cubic-bezier(.34,1.56,.64,1) both}
+.cletter .tile{width:66px;height:66px;border-radius:18px;color:#fff;font-size:32px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(28,35,51,.18)}
+.cletter small{display:block;margin-top:6px;font-size:10px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted)}
+@keyframes popIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+.brow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.blab{flex:0 0 118px;font-size:13px;font-weight:700}
+.btrack{flex:1;height:16px;background:#edf0f7;border-radius:99px;overflow:hidden}
+.bfill{display:block;height:100%;width:0;border-radius:99px;transition:width 1.1s cubic-bezier(.22,.9,.3,1)}
+.bscore{flex:0 0 30px;text-align:right;font-weight:800;font-size:15px}
+.blevel{flex:0 0 150px;font-size:11.5px;color:var(--muted);font-weight:600}
+h3.rh{font-size:16px;font-weight:800;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+h3.rh::before{content:"";width:4px;height:18px;border-radius:4px;background:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;
+  animation:fadeUp .4s both;transition:transform .15s;cursor:default}
+.chip:hover{transform:translateY(-2px) scale(1.04)}
+.note{border-radius:13px;padding:14px 16px;font-size:14px;line-height:1.5;margin-bottom:10px;animation:fadeUp .4s both}
+.note b{display:block;margin-bottom:4px}
+.note.warn{background:var(--warn-bg);border:1px solid var(--warn-bd);color:var(--warn-tx)}
+.note.info{background:var(--info-bg);border:1px solid var(--info-bd);color:var(--info-tx)}
+.note.ok{background:#e9f9ef;border:1px solid #b7e4c7;color:#1b6e3c}
+.rbtns{display:flex;gap:10px;margin-top:26px}
+
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:98}
+
+@media(max-width:600px){
+  .card{padding:20px 16px}
+  #intro h1{font-size:26px}
+  .blab{flex-basis:90px}.blevel{display:none}
+  .cletter{width:56px}.cletter .tile{width:56px;height:56px;font-size:26px}
+}
+@media print{
+  body::before,body::after,#confetti,.rbtns,#topbar{display:none}
+  .card{box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar"><div id="topfill"></div></div>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+
+<!-- ================= INTRO ================= -->
+<div class="card" id="intro">
+  <div class="eyebrow">Career Discovery Tool</div>
+  <h1>Find the career that fits you</h1>
+  <p class="sub">50 quick questions. About 15 minutes. Get your personal Holland Code (RIASEC) with career suggestions.</p>
+  <div class="legend" id="legend"></div>
+  <div class="note info"><b>Before you start</b>
+    There are no right or wrong answers. Choose what is most true for you, not what sounds good. Answer honestly for the best result.</div>
+  <button class="btn pulse" onclick="startTest()">Start the Test</button>
+</div>
+
+<!-- ================= QUIZ ================= -->
+<div id="quiz" class="hidden" style="display:none">
+  <div class="quizhead">
+    <span class="secpill" id="secpill"></span>
+    <span class="pagepill" id="pagepill"></span>
+  </div>
+  <div id="questions"></div>
+  <div class="nav">
+    <button class="btn ghost" id="backBtn" onclick="move(-1)">Back</button>
+    <button class="btn" id="nextBtn" onclick="move(1)">Next</button>
+  </div>
+</div>
+
+<!-- ================= RESULTS ================= -->
+<div id="results" class="hidden" style="display:none"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================
+   DATA  (logic + tags identical to approved version)
+   ===================================================== */
+const TYPES=["R","I","A","S","E","C"];
+const TYPE_NAME={R:"Realistic",I:"Investigative",A:"Artistic",S:"Social",E:"Enterprising",C:"Conventional"};
+const TYPE_COLOR={R:"#43a047",I:"#1e88e5",A:"#8e24aa",S:"#e53935",E:"#fb8c00",C:"#00897b"};
+const LIKERT_FWD=[0,0,0,1,2], LIKERT_REV=[2,1,0,0,0];
+const LIKERT_LBL=["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+const LIKERT_SHORT=["Strongly Disagree","Disagree","Neutral","Agree","Strongly Agree"];
+const REVERSE_Q={R:8,I:16,A:24,S:32,E:40,C:48};
+const CAREERS={
+ R:["Technician","Electrician","Mechanic","Farmer","Pilot","Carpenter","Sports trainer"],
+ I:["Scientist","Doctor","Lab technician","Pharmacist","Software developer","Researcher"],
+ A:["Graphic designer","Musician","Writer","Photographer","Fashion designer","Architect"],
+ S:["Teacher","Nurse","Counsellor","Social worker","Customer service officer","HR officer"],
+ E:["Manager","Sales officer","Business owner","Marketing officer","Lawyer"],
+ C:["Accountant","Bank officer","Auditor","Office administrator","Librarian","Records officer"]};
+
+const QUESTIONS=[
+{n:1,kind:"mc",text:"You get one free day with no work. What would you most enjoy doing?",opts:[
+ ["Fix or build something at home","R"],["Watch a science video or read about how things work","I"],
+ ["Draw, paint, or play music","A"],["Meet friends and enjoy a community event","S"]]},
+{n:2,kind:"mc",text:"Your school or office holds a special day. Which job do you choose?",opts:[
+ ["Welcome guests and speak on stage","E"],["Set up the hall, chairs, and sound system","R"],
+ ["Plan the timetable and check the money","C"],["Design the posters and decorations","A"]]},
+{n:3,kind:"mc",text:"A free evening class is offered near you. Which one do you join?",opts:[
+ ["How to start and run a small business","E"],["How to understand why people behave the way they do","I"],
+ ["How to repair bicycles and simple machines","R"],["How to write short stories","A"]]},
+{n:4,kind:"mc",text:"The fan at your home stops working. What do you do first?",opts:[
+ ["Ask someone at home to help you decide what to do","S"],["Search online to understand why it stopped","I"],
+ ["Open it and try to find the fault yourself","R"],["Write down the problem and call a repair service","C"]]},
+{n:5,kind:"likert",type:"R",text:"I enjoy making or repairing things with my hands."},
+{n:6,kind:"likert",type:"R",text:"I like to work with tools, machines, or vehicles."},
+{n:7,kind:"likert",type:"R",text:"I would rather do physical work or work outdoors than sit at a desk."},
+{n:8,kind:"likert",type:"R",rev:true,text:"I do not enjoy building or fixing things."},
+{n:9,kind:"mc",text:"Your class or team must choose a project topic. Which one do you pick?",opts:[
+ ["\"Why do earthquakes happen?\" and study the causes","I"],["\"How can we help elderly people in our area?\"","S"],
+ ["\"How can young people start small businesses?\"","E"],["\"The famous music and art of our country\"","A"]]},
+{n:10,kind:"mc",text:"You get a new phone with many new features. What do you do first?",opts:[
+ ["Try every setting until you understand how it all works","I"],["Ask a friend who knows phones to show you","S"],
+ ["Follow the manual step by step","C"],["Start taking photos and videos for fun","A"]]},
+{n:11,kind:"mc",text:"Which job sounds most interesting to you?",opts:[
+ ["Working in a science laboratory","I"],["Leading the sales team of a company","E"],
+ ["Teaching music or art","A"],["Managing the office records of a company","C"]]},
+{n:12,kind:"mc",text:"Which video would you watch first?",opts:[
+ ["\"How the human brain makes decisions\"","I"],["\"How to convince people at work\"","E"],
+ ["\"Simple home repairs in one hour\"","R"],["\"How to arrange your home in one weekend\"","C"]]},
+{n:13,kind:"likert",type:"I",text:"I enjoy solving difficult problems and puzzles."},
+{n:14,kind:"likert",type:"I",text:"I like to learn how and why things work."},
+{n:15,kind:"likert",type:"I",text:"I enjoy reading or watching programmes that teach me new things."},
+{n:16,kind:"likert",type:"I",rev:true,text:"I lose interest when a subject becomes hard to understand."},
+{n:17,kind:"mc",text:"Your room needs a new look. What would you most enjoy doing?",opts:[
+ ["Paint a picture on the wall and choose your own colours","A"],["Measure, plan, and arrange everything in the right order","C"],
+ ["Study online pages to find the best low-cost ideas","I"],["Invite friends and enjoy the day together","S"]]},
+{n:18,kind:"mc",text:"A free community centre opens near you. Which activity do you join?",opts:[
+ ["Music, dance, drama, or art classes","A"],["Public speaking and leadership training","E"],
+ ["Computer and machine repair classes","R"],["Science and nature club","I"]]},
+{n:19,kind:"mc",text:"A friend asks you to help at their small cafe. Which task do you pick?",opts:[
+ ["Design the menu card and paint the signboard","A"],["Keep the accounts and records correct","C"],
+ ["Talk to customers and invite more people","E"],["Repair the tables, chairs, and shelves","R"]]},
+{n:20,kind:"mc",text:"Which gift would make you most happy?",opts:[
+ ["Drawing or painting materials","A"],["A book full of facts and new knowledge","I"],
+ ["A useful tool set for the home","R"],["A planner and pens to organise the year","C"]]},
+{n:21,kind:"likert",type:"A",text:"I enjoy activities like drawing, music, writing, or design."},
+{n:22,kind:"likert",type:"A",text:"I like to find new and different ways to do things."},
+{n:23,kind:"likert",type:"A",text:"I can express my ideas well through art, music, or words."},
+{n:24,kind:"likert",type:"A",rev:true,text:"I have no interest in art, music, or creative activities."},
+{n:25,kind:"mc",text:"Your team plans a school or office event. Which job do you choose?",opts:[
+ ["Guide the visitors and help them with their needs","S"],["Manage the money and keep the accounts","C"],
+ ["Lead the team and give the main speech","E"],["Prepare the decorations and artwork","A"]]},
+{n:26,kind:"mc",text:"Which work would make you feel most satisfied?",opts:[
+ ["Teaching children or training adults","S"],["Designing buildings or machines","I"],
+ ["Managing a business and finding new customers","E"],["Checking records and finding mistakes","C"]]},
+{n:27,kind:"mc",text:"Your office or class plans a health day. Which role do you take?",opts:[
+ ["Explain health tips to the visitors","S"],["Plan the budget and timetable","C"],
+ ["Set up the hall and test the equipment","R"],["Invite guests and open the event with a speech","E"]]},
+{n:28,kind:"mc",text:"Which club would you join first?",opts:[
+ ["Social service club - organising help for the community","S"],["Debate and public speaking club","E"],
+ ["Science and astronomy club","I"],["Photography and film club","A"]]},
+{n:29,kind:"likert",type:"S",text:"I enjoy helping people with their problems."},
+{n:30,kind:"likert",type:"S",text:"I like to teach, train, or explain things to other people."},
+{n:31,kind:"likert",type:"S",text:"I like to spend time with people more than working alone."},
+{n:32,kind:"likert",type:"S",rev:true,text:"I prefer to work alone rather than with people."},
+{n:33,kind:"mc",text:"Your group gets a big project. What role do you usually take?",opts:[
+ ["Lead the group, divide the work, and push everyone forward","E"],["Do the research and prepare the facts","I"],
+ ["Keep the records and make sure everything is in order","C"],["Design the presentation and make it look good","A"]]},
+{n:34,kind:"mc",text:"What would you most enjoy doing on a free weekend?",opts:[
+ ["Plan a small business idea with friends","E"],["Play sports or go to the gym","R"],
+ ["Read and learn something new","I"],["Help and spend time at a community centre","S"]]},
+{n:35,kind:"mc",text:"In a school or office event, which job do you choose?",opts:[
+ ["Make the main decisions and lead the team","E"],["Write the report and keep the papers in order","C"],
+ ["Handle the art and decoration work","A"],["Take care of the guests one by one","S"]]},
+{n:36,kind:"mc",text:"Which statement sounds most like you?",opts:[
+ ["I like to convince people to agree with my ideas","E"],["I like to study a subject deeply before I decide","I"],
+ ["I like to check every small detail before I finish a task","C"],["I like to keep everyone calm and friendly in the group","S"]]},
+{n:37,kind:"likert",type:"E",text:"I feel comfortable leading a group and making decisions."},
+{n:38,kind:"likert",type:"E",text:"I enjoy convincing people to accept new ideas."},
+{n:39,kind:"likert",type:"E",text:"I like to start new projects, even when they are risky."},
+{n:40,kind:"likert",type:"E",rev:true,text:"I do not like to lead others or make decisions for a group."},
+{n:41,kind:"mc",text:"Your family plans a trip. Which job do you take?",opts:[
+ ["Prepare the budget, tickets, and timetable","C"],["Lead the group and decide the main plan","E"],
+ ["Take photos and write about the trip","A"],["Learn about the history and nature of the places","I"]]},
+{n:42,kind:"mc",text:"Which task do you finish fastest and with the most care?",opts:[
+ ["Checking a long list for mistakes","C"],["Fixing or assembling something","R"],
+ ["Convincing someone to accept your plan","E"],["Creating a new design or idea","A"]]},
+{n:43,kind:"mc",text:"Your teacher or manager gives four tasks. Which do you pick first?",opts:[
+ ["Arrange all the files and data in the correct order","C"],["Present the plan in front of the audience","E"],
+ ["Study the results and look for patterns","I"],["Design the poster for the event","A"]]},
+{n:44,kind:"mc",text:"Which hobby sounds best to you?",opts:[
+ ["Collecting and organising things such as stamps, books, or records","C"],["Building models or repairing things","R"],
+ ["Taking part in social service with a group","S"],["Writing stories, poems, or songs","A"]]},
+{n:45,kind:"likert",type:"C",text:"I like to keep my things in order and know where everything is."},
+{n:46,kind:"likert",type:"C",text:"I enjoy working with numbers, lists, and records."},
+{n:47,kind:"likert",type:"C",text:"I like to follow clear rules and do work in the correct way."},
+{n:48,kind:"likert",type:"C",rev:true,text:"I find it hard to keep my work and things organised."},
+{n:49,kind:"mc",tie:true,text:"If you have one completely free day, which activity would you pick first?",opts:[
+ ["Repair or build something","R"],["Visit a library, read, or watch a science video","I"],
+ ["Draw, write, play music, or take photos","A"],["Spend the day helping or talking with people","S"],
+ ["Plan or start a small money-making project","E"],["Clean and arrange your room, files, or collections","C"]]},
+{n:50,kind:"likert",clarity:true,text:"I am clear about the career path I want to follow."}];
+
+const SECTIONS=[
+ {name:"Realistic",letter:"R",nums:[1,2,3,4,5,6,7,8]},
+ {name:"Investigative",letter:"I",nums:[9,10,11,12,13,14,15,16]},
+ {name:"Artistic",letter:"A",nums:[17,18,19,20,21,22,23,24]},
+ {name:"Social",letter:"S",nums:[25,26,27,28,29,30,31,32]},
+ {name:"Enterprising",letter:"E",nums:[33,34,35,36,37,38,39,40]},
+ {name:"Conventional",letter:"C",nums:[41,42,43,44,45,46,47,48]},
+ {name:"Final Questions",letter:"*",nums:[49,50]}];
+
+let current=0;
+const answers={};
+const $=id=>document.getElementById(id);
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- intro legend ---------- */
+ $("legend").innerHTML=TYPES.map(t=>
+ `<span class="lg"><i style="background:${TYPE_COLOR[t]}"></i>${t} - ${TYPE_NAME[t]}</span>`).join("");
+
+/* ---------- navigation ---------- */
+function startTest(){
+  $("intro").style.display="none";
+  $("quiz").style.display="block";
+  renderSection();
+}
+function setAccent(letter){
+  const c = letter==="*" ? "#5e6ad2" : TYPE_COLOR[letter];
+  document.documentElement.style.setProperty("--accent",c);
+}
+function renderSection(){
+  const sec=SECTIONS[current];
+  setAccent(sec.letter);
+  $("secpill").textContent = sec.letter==="*" ? "Final" : sec.letter+" - "+sec.name;
+  $("pagepill").textContent = "Page "+(current+1)+" of "+SECTIONS.length;
+  let html="";
+  sec.nums.forEach((n,idx)=>{
+    const q=QUESTIONS[n-1];
+    html+=`<div class="q" id="card-${q.n}" style="animation-delay:${idx*60}ms">
+      <span class="qnum">Q${q.n}</span><span class="qtext">${q.text}</span>`;
+    if(q.kind==="mc"){
+      html+='<div class="opts">';
+      q.opts.forEach((o,i)=>{
+        const wide=q.opts.length===6?' style="min-width:45%"':"";
+        html+=`<label class="opt"${wide}><input class="sr" type="radio" name="q${q.n}" value="${i}">
+          <span class="key">${String.fromCharCode(65+i)}</span><span>${o[0]}</span>
+          <span class="tickmark">&#10003;</span></label>`;
+      });
+      html+="</div>";
+    } else {
+      html+=`<div class="likert">
+        <div class="lcur idle" id="cur-${q.n}">Drag the bar or tap a point below</div>
+        <input type="range" class="range untouched" id="rng-${q.n}" min="0" max="4" step="1" value="2" data-q="${q.n}">
+        <div class="ticks" id="ticks-${q.n}">`+
+        LIKERT_SHORT.map((l,i)=>`<div class="tick" data-q="${q.n}" data-i="${i}"><div class="dot"></div><span>${l}</span></div>`).join("")+
+      `</div></div>`;
+    }
+    html+="</div>";
+  });
+  $("questions").innerHTML=html;
+  sec.nums.forEach(n=>{ const q=QUESTIONS[n-1];
+    if(q.kind==="mc" && answers[q.n]!==undefined) setSelectedUI(q.n);
+    if(q.kind==="likert" && answers[q.n]!==undefined) setLikertUI(q.n);
+  });
+  $("backBtn").style.visibility = current===0 ? "hidden":"visible";
+  $("nextBtn").textContent = current===SECTIONS.length-1 ? "See My Results" : "Next";
+  updateProgress();
+  window.scrollTo({top:0,behavior:reduced?"auto":"smooth"});
+}
+function setSelectedUI(qn){
+  const card=$("card-"+qn);
+  card.querySelectorAll(".opt").forEach(l=>l.classList.remove("selected"));
+  const inp=card.querySelector(`input[name="q${qn}"][value="${answers[qn]}"]`);
+  if(inp) inp.closest(".opt").classList.add("selected");
+}
+function setLikertUI(qn){
+  const v=answers[qn];
+  const rng=$("rng-"+qn), cur=$("cur-"+qn);
+  if(v===undefined){ rng.classList.add("untouched"); cur.classList.add("idle");
+    cur.textContent="Drag the bar or tap a point below"; return; }
+  rng.classList.remove("untouched"); cur.classList.remove("idle");
+  rng.value=v;
+  rng.style.setProperty("--p",(v/4*100)+"%");
+  cur.textContent=LIKERT_LBL[v];
+  $("ticks-"+qn).querySelectorAll(".tick").forEach((t,i)=>t.classList.toggle("active",i===v));
+}
+function updateProgress(){
+  const done=Object.keys(answers).length;
+  $("topfill").style.width=(done/50*100)+"%";
+}
+let toastTimer;
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2800);
+}
+
+/* ---------- events (delegated) ---------- */
+const quiz=$("quiz");
+quiz.addEventListener("input",e=>{
+  if(e.target.classList.contains("range")){
+    const qn=+e.target.dataset.q;
+    answers[qn]=+e.target.value;
+    setLikertUI(qn); updateProgress();
+    const c=$("card-"+qn); c.classList.remove("missing");
+  }
+});
+quiz.addEventListener("change",e=>{
+  if(e.target.type==="radio"){
+    const qn=+e.target.name.slice(1);
+    answers[qn]=+e.target.value;
+    setSelectedUI(qn); updateProgress();
+    $("card-"+qn).classList.remove("missing");
+  }
+});
+quiz.addEventListener("click",e=>{
+  const t=e.target.closest(".tick");
+  if(t){ const qn=+t.dataset.q;
+    answers[qn]=+t.dataset.i;
+    setLikertUI(qn); updateProgress();
+    $("card-"+qn).classList.remove("missing");
+  }
+});
+
+function move(dir){
+  if(dir===1){
+    const missing=SECTIONS[current].nums.filter(n=>answers[n]===undefined);
+    if(missing.length){
+      missing.forEach(n=>{
+        const c=$("card-"+n); c.classList.remove("missing");
+        void c.offsetWidth; c.classList.add("missing"); // restart animation
+      });
+      toast("Please answer question"+(missing.length>1?"s":"")+": "+missing.join(", "));
+      $("card-"+missing[0]).scrollIntoView({behavior:reduced?"auto":"smooth",block:"center"});
+      return;
+    }
+    if(current===SECTIONS.length-1){ showResults(); return; }
+  }
+  current+=dir;
+  renderSection();
+}
+
+/* =====================================================
+   SCORING  (identical logic to approved prototype)
+   ===================================================== */
+function scoreAll(){
+  const sc={R:0,I:0,A:0,S:0,E:0,C:0};
+  const revPts={R:null,I:null,A:null,S:null,E:null,C:null};
+  const letterCounts={A:0,B:0,C:0,D:0,E:0,F:0};
+  const likert=[]; let q50=null;
+  QUESTIONS.forEach(q=>{
+    const a=answers[q.n]; if(a===undefined)return;
+    if(q.kind==="mc"){
+      const t=q.opts[a][1];
+      sc[t]+= q.tie?1:2;
+      if(!q.tie) letterCounts[String.fromCharCode(65+a)]++;
+    } else {
+      likert.push(a);
+      if(q.clarity){ q50=a; return; }
+      sc[q.type]+= q.rev?LIKERT_REV[a]:LIKERT_FWD[a];
+      if(q.rev) revPts[q.type]=LIKERT_REV[a];
+    }
+  });
+  return {sc,revPts,letterCounts,likert,q50};
+}
+function level(s){
+  if(s>=13)return"High - strong type"; if(s>=9)return"Medium - possible type";
+  if(s>=5)return"Low - weak type"; return"Very low";
+}
+function countUp(el,target,ms){
+  if(reduced){el.textContent=target;return;}
+  const t0=performance.now();
+  (function step(t){
+    const p=Math.min(1,(t-t0)/ms), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*e);
+    if(p<1)requestAnimationFrame(step);
+  })(t0);
+}
+
+/* ---------- results ---------- */
+function showResults(){
+  const r=scoreAll();
+  const q49Type=QUESTIONS[48].opts[answers[49]][1];
+  const sorted=TYPES.slice().sort((a,b)=>r.sc[b]-r.sc[a]);
+
+  let codeStr=sorted[0]+sorted[1], tieNote="";
+  const thirdVal=r.sc[sorted[2]];
+  const tied=sorted.filter(t=>!codeStr.includes(t)&&r.sc[t]===thirdVal);
+  if(tied.length===1) codeStr+=tied[0];
+  else if(tied.length>1){
+    if(tied.includes(q49Type)){ codeStr+=q49Type;
+      tieNote="There was a tie at third place between "+tidedFix(tied)+". Question 49 was used to break the tie.";
+    } else tieNote="There is a tie at third place between "+tidedFix(tied)+". All of these are valid third letters: "+codeStr+" + ("+tied.join(" or ")+").";
+  }
+  function tidedFix(a){return a.join(" and ");}
+  if(r.sc[sorted[0]]===r.sc[sorted[1]])
+    tieNote+=" Note: there is also a tie at the top. Your profile is mixed; read the lists for all your top types.";
+
+  /* validity */
+  const warnings=[];
+  const maxLetter=Object.keys(r.letterCounts).reduce((a,b)=>r.letterCounts[a]>=r.letterCounts[b]?a:b);
+  if(r.letterCounts[maxLetter]>=18)
+    warnings.push("Position bias: option "+maxLetter+" was chosen "+r.letterCounts[maxLetter]+" times out of 24 option questions. This may show a habit of picking the same position.");
+  const extremes=r.likert.filter(a=>a===0||a===4).length;
+  if(extremes>=22)
+    warnings.push("Extreme responding: "+extremes+" of 25 scale questions were answered with the strongest choice. Results may not be balanced.");
+  TYPES.forEach(t=>{
+    if(r.sc[t]>=12&&r.revPts[t]===0)
+      warnings.push("Careless answering: type "+t+" scored "+r.sc[t]+" but its reverse question (Q"+REVERSE_Q[t]+") scored 0. Results may need checking.");
+  });
+  const lowClarity=(r.q50===0||r.q50===1);
+
+  /* ---- build ---- */
+  let html=`<div class="card">
+    <h2>Your Results</h2>
+    <p class="rsub">Your Holland Code shows your three strongest work personality types.</p>
+    <div class="codewrap">`;
+  codeStr.split("").forEach((L,i)=>{
+    html+=`<div class="cletter" style="animation-delay:${i*.15+.2}s">
+      <div class="tile" style="background:${TYPE_COLOR[L]}">${L}</div>
+      <small>${TYPE_NAME[L]}</small></div>`;
+  });
+  html+=`</div><h3 class="rh">Your scores</h3>`;
+  TYPES.forEach(t=>{
+    html+=`<div class="brow">
+      <span class="blab" style="color:${TYPE_COLOR[t]}">${t} - ${TYPE_NAME[t]}</span>
+      <div class="btrack"><span class="bfill" id="bar-${t}" style="background:${TYPE_COLOR[t]}"></span></div>
+      <span class="bscore" id="score-${t}">0</span>
+      <span class="blevel">${level(r.sc[t])}</span></div>`;
+  });
+
+  html+=`<h3 class="rh">Careers for your main type (${codeStr[0]})</h3><div class="chips">`;
+  CAREERS[codeStr[0]].forEach((c,i)=>{const col=TYPE_COLOR[codeStr[0]];
+    html+=`<span class="chip" style="animation-delay:${i*.05}s;background:${col}14;color:${col};border:1px solid ${col}55">${c}</span>`;});
+  html+=`</div><h3 class="rh">Related careers from your second type (${codeStr[1]})</h3><div class="chips">`;
+  CAREERS[codeStr[1]].forEach((c,i)=>{const col=TYPE_COLOR[codeStr[1]];
+    html+=`<span class="chip" style="animation-delay:${i*.05}s;background:${col}14;color:${col};border:1px solid ${col}55">${c}</span>`;});
+  html+=`</div>`;
+
+  html+=`<h3 class="rh">Result quality</h3>`;
+  if(warnings.length===0) html+=`<div class="note ok"><b>All checks passed</b>Your answers look consistent and reliable.</div>`;
+  warnings.forEach(w=>html+=`<div class="note warn"><b>Please note</b>${w}</div>`);
+  if(tieNote) html+=`<div class="note info"><b>About your code</b>${tieNote}</div>`;
+  if(lowClarity) html+=`<div class="note warn"><b>Career exploration advice</b>You said you are not yet clear about your career path. Read about the careers above, talk to people who work in those jobs, and try short courses or work shadowing before you decide.</div>`;
+
+  html+=`<div class="rbtns">
+    <button class="btn ghost" onclick="window.print()">Print / Save PDF</button>
+    <button class="btn" onclick="location.reload()">Restart Test</button></div></div>`;
+
+  $("quiz").style.display="none";
+  const res=$("results"); res.innerHTML=html; res.style.display="block";
+  setAccent(TYPE_COLOR[codeStr[0]]);
+
+  /* ---- animate in ---- */
+  setTimeout(()=>{
+    TYPES.forEach(t=>{
+      $("bar-"+t).style.width=(r.sc[t]/16*100)+"%";
+      countUp($("score-"+t),r.sc[t],1000);
+    });
+  },250);
+  updateProgress();
+  $("topfill").style.width="100%";
+  if(warnings.length===0&&!reduced) confetti();
+  window.scrollTo(0,0);
+}
+
+/* ---------- confetti ---------- */
+function confetti(){
+  const c=$("confetti"),x=c.getContext("2d");
+  c.width=innerWidth;c.height=innerHeight;
+  const cols=["#43a047","#1e88e5","#8e24aa","#e53935","#fb8c00","#00897b"];
+  const P=[];
+  for(let i=0;i<160;i++)P.push({x:Math.random()*c.width,y:-20-Math.random()*c.height*.6,
+    w:6+Math.random()*6,h:9+Math.random()*8,c:cols[i%6],vy:2.2+Math.random()*3,
+    vx:-1+Math.random()*2,r:Math.random()*Math.PI,vr:-.12+Math.random()*.24});
+  const t0=performance.now();
+  (function f(t){
+    const el=t-t0;x.clearRect(0,0,c.width,c.height);let alive=false;
+    P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      if(p.y<c.height+20)alive=true;
+      x.save();x.translate(p.x,p.y);x.rotate(p.r);
+      x.globalAlpha=Math.max(0,1-el/3200);x.fillStyle=p.c;
+      x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();});
+    if(alive&&el<3400)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height);
+  })(t0);
+}
+</script>
+</body>
+</html>
